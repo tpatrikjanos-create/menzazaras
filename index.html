@@ -46,7 +46,7 @@ button{font:inherit}
 .splash .logo{width:min(78vw,380px);height:auto}
 .tagline{font-size:13px;letter-spacing:.4em;text-transform:uppercase;color:var(--mute);animation:fade 1s 1.6s both;margin-top:-6px}
 
-/* layout */
+/* elrendezés */
 #app{min-height:100vh;position:relative;padding-bottom:60px}
 .wrap{max-width:780px;margin:0 auto;padding:0 18px}
 .topbar{display:flex;align-items:center;gap:12px;max-width:780px;margin:0 auto;padding:18px 18px 8px}
@@ -114,9 +114,9 @@ button{font:inherit}
 .kpi{background:var(--paper);border-radius:22px;padding:16px;box-shadow:var(--shadow);animation:rise .6s both;animation-delay:calc(var(--i,0)*80ms)}
 .kpi span{font-size:12px;color:var(--mute);letter-spacing:.06em;text-transform:uppercase}
 .kpi b{display:block;font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:24px;margin-top:6px;font-variant-numeric:tabular-nums}
-.kpi.wide{grid-column:1/-1;background:var(--grad);color:#fff;box-shadow:0 16px 34px -14px rgba(224,27,15,.7)}
+.kpi.wide{grid-column:1/-1;background:var(--grad);color:#fff;box-shadow:0 16px 34px -14px rgba(224,27,15,.7);margin-top:16px}
 .kpi.wide span{color:#fff;opacity:.9}
-.kpi.wide b{font-size:40px;color:#fff}
+.kpi.wide b{font-size:44px;color:#fff}
 
 /* szegmens */
 .seg{display:flex;background:rgba(255,255,255,.55);border-radius:999px;padding:5px;gap:4px;margin-top:14px;box-shadow:inset 0 1px 2px rgba(0,0,0,.05);flex-wrap:wrap}
@@ -125,11 +125,22 @@ button{font:inherit}
 .range{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .range label{margin:0}
 
-/* diagram */
+/* diagramok */
 .bars{display:flex;align-items:flex-end;gap:10px;height:200px;padding-top:10px;overflow-x:auto}
 .bar{flex:1;min-width:34px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.pair{display:flex;align-items:flex-end;gap:4px;width:100%;height:100%;justify-content:center}
+.pair .fill{flex:1;max-width:22px}
 .fill{width:100%;max-width:44px;height:var(--h);min-height:4px;background:linear-gradient(180deg,#2EE0BE 0%,#17B69A 55%,#0E8C75 100%);border-radius:14px 14px 8px 8px;transform-origin:bottom;animation:growY .9s cubic-bezier(.2,1.1,.3,1) both;animation-delay:var(--d);box-shadow:0 10px 20px -10px rgba(23,182,154,.8)}
+.fill.fill-b{background:linear-gradient(180deg,#FFD27A 0%,#E9A21B 60%,#B97A07 100%);box-shadow:0 10px 20px -10px rgba(233,162,27,.8)}
 .bar span{font-size:11px;color:var(--mute);margin-top:8px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.legend{font-size:13px;color:var(--mute);margin-bottom:6px}
+.lg{display:inline-block;width:12px;height:12px;border-radius:4px;margin:0 6px 0 14px;vertical-align:middle}
+.lg.a{background:#17B69A}.lg.b{background:#E9A21B}
+.hrow{display:grid;grid-template-columns:96px 1fr 110px;gap:12px;align-items:center;margin:12px 0}
+.hrow span{font-size:14px;color:var(--mute)}
+.hrow b{text-align:right;font-variant-numeric:tabular-nums;font-size:14px}
+.htrack{height:12px;background:#E9E2CF;border-radius:99px;overflow:hidden}
+.htrack i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,#E9A21B,#17B69A);border-radius:99px;transform-origin:left;animation:grow 1s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--i,0)*120ms + 200ms)}
 
 /* űrlap */
 label{display:block;font-size:13px;color:var(--mute);margin:14px 0 6px;letter-spacing:.02em}
@@ -139,13 +150,13 @@ label{display:block;font-size:13px;color:var(--mute);margin:14px 0 6px;letter-sp
 .amount-wrap{position:relative}
 .amount-wrap .field{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;padding:14px 60px 14px 18px;text-align:right}
 .amount-wrap::after{content:"Ft";position:absolute;right:18px;top:50%;transform:translateY(-50%);font-weight:700;color:var(--mute);pointer-events:none}
-.row{display:grid;grid-template-columns:1.3fr 1fr auto;gap:8px;margin-bottom:10px}
+.row{display:grid;grid-template-columns:1.3fr 1fr auto;gap:8px;margin-bottom:10px;animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
 .row .field{padding:12px 12px;font-size:16px}
 .row .x{background:#eadfc8;border:0;border-radius:12px;font-size:20px;padding:0 14px;cursor:pointer}
 .progress{display:flex;align-items:center;gap:12px;font-weight:700;margin-top:6px}
 .progress .bar2{flex:1;height:10px;background:#d6cbb0;border-radius:99px;overflow:hidden}
 .progress .bar2 i{display:block;height:100%;background:linear-gradient(90deg,var(--orange),var(--teal),var(--red));transition:width .4s}
-.nav{display:flex;gap:12px;margin-top:18px}
+.nav{display:flex;gap:14px;margin-top:18px}
 .nav .btn{flex:1}
 .yn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
 .block-card{text-align:center;border:3px solid var(--red)}
@@ -156,52 +167,54 @@ label{display:block;font-size:13px;color:var(--mute);margin:14px 0 6px;letter-sp
 .hist li{background:#fff;border-radius:14px;padding:10px 14px;font-size:14px;box-shadow:var(--shadow)}
 .hist li span{display:inline-block;color:var(--mute);margin-right:8px;font-variant-numeric:tabular-nums;font-size:12px}
 
-/* banner, teszt, toast */
+/* banner, toast, fejlesztői kártya */
 .demo-banner{max-width:744px;margin:10px auto 0;background:var(--ink);color:var(--paper);border-radius:18px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:14px;animation:rise .6s both;flex-wrap:wrap}
 .demo-banner .btn{background:var(--grad);color:#fff;min-height:36px;padding:6px 14px;border-radius:12px;font-size:13px}
 .badge{display:inline-block;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:.04em}
 .badge.dev{background:#fbd9a0;color:#6b3d00}
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(140px);background:var(--ink);color:var(--paper);padding:14px 20px;border-radius:14px;transition:transform .3s;max-width:90%;text-align:center;z-index:20;box-shadow:var(--shadow)}
 #toast.on{transform:translateX(-50%) translateY(0)}
-.exports{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.exports{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}
 .exports .btn{min-height:52px;padding:12px 10px;font-size:15px;color:#fff}
-.devcard{display:flex;align-items:center;gap:14px;background:var(--ink);color:var(--paper);border-radius:24px;padding:16px 18px;margin:12px 0 6px;box-shadow:var(--shadow)}
+.devcard{display:flex;align-items:center;gap:14px;background:var(--ink);color:var(--paper);border-radius:24px;padding:16px 18px;margin:6px 0 0;box-shadow:var(--shadow)}
 .devcard .dc-text{flex:1;min-width:0}
 .devcard b{display:block;font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:20px}
 .devcard small{opacity:.75;font-size:13px;line-height:1.4}
 .devcard .btn{min-height:46px;padding:10px 18px;border-radius:14px;white-space:nowrap}
+.fejl{display:flex;justify-content:flex-end;margin-top:10px}
+.dstep{animation:rise .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*70ms)}
+.kpi.wide.dfinal b{font-size:44px}
 
-/* ---- mozgás: képernyőváltás, kérdések, zárás ---- */
+/* mozgás: képernyőváltás, kérdések, zárás */
 #app.fwd{animation:slideF .6s cubic-bezier(.2,.8,.2,1) both}
 #app.back{animation:slideB .6s cubic-bezier(.2,.8,.2,1) both}
 @keyframes slideF{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
 @keyframes slideB{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
 .rv{animation:rise .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*45ms)}
-.row{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
 .btn.grad.big{animation:ring 2.4s ease-out infinite}
 .qcard.pulse-ok{animation:okPulse .45s ease-out}
 @keyframes okPulse{0%{transform:scale(1);box-shadow:var(--shadow)}40%{transform:scale(1.02);box-shadow:0 0 0 6px rgba(23,182,154,.35),var(--shadow)}100%{transform:none;box-shadow:var(--shadow)}}
 .hero .num{animation:rise .8s .2s both}
 .confetti{position:fixed;width:10px;height:14px;border-radius:3px;z-index:50;pointer-events:none;animation:confetti 1.8s cubic-bezier(.1,.7,.3,1) forwards}
 @keyframes confetti{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0}}
-/* ---- gombok távolsága, díszítés ---- */
-.nav{gap:14px}
+
+/* gombok távolsága, díszítés */
 .btn.block{margin-top:14px}
 .btn.block:first-child{margin-top:0}
 .btn.grad{position:relative;overflow:hidden}
 .btn.grad::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);transform:translateX(-120%);animation:sheen 3.4s 1.2s infinite;pointer-events:none}
 @keyframes sheen{to{transform:translateX(120%)}}
-.mark svg{filter:drop-shadow(0 0 0 rgba(233,162,27,0));animation:glow 3.6s ease-in-out infinite 1.6s}
+.mark svg{animation:glow 3.6s ease-in-out infinite 1.6s}
 @keyframes glow{0%,100%{filter:drop-shadow(0 0 0 rgba(233,162,27,0))}50%{filter:drop-shadow(0 12px 26px rgba(233,162,27,.35))}}
+
 /* köszönő képernyő */
 .thanks{font-size:clamp(26px,6.5vw,36px);line-height:1.25;margin:18px 0 6px;text-align:center}
 .thanks span{display:inline-block;opacity:0;transform:translateY(18px) scale(.96);animation:letterIn .6s cubic-bezier(.2,.9,.25,1.2) forwards;animation-delay:calc(.35s + var(--i)*38ms)}
 @keyframes letterIn{to{opacity:1;transform:none}}
 .thanks-sub{text-align:center;color:var(--mute);margin:6px 0 4px;opacity:0;animation:fade .8s 1.6s forwards}
-.kpi.total-first b{font-size:44px}
-/* teljes kép */
+
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
-@media(max-width:420px){.kpis{grid-template-columns:1fr}}
+@media(max-width:420px){.kpis{grid-template-columns:1fr}.hrow{grid-template-columns:80px 1fr 96px}}
 </style>
 </head>
 <body>
@@ -212,18 +225,17 @@ label{display:block;font-size:13px;color:var(--mute);margin:14px 0 6px;letter-sp
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script type="module">
 /* ===================== FIREBASE ===================== */
-// Külön Firebase projekt az zárás appnak. Amíg a PROJEKT / IDE_ szöveg szerepel, csak teszt/demó működik.
 const FIREBASE_CONFIG={
   apiKey:"AIzaSyC2Rcti5t2rUDbPawyeV6eNOiaNJ6rI4Ro",
   authDomain:"menzazaras.firebaseapp.com",
-  databaseURL:"https://menzazaras-default-rtdb.europe-west1.firebasedatabase.app", // régió: ellenőrizd a Realtime Database oldalán
+  databaseURL:"https://menzazaras-default-rtdb.europe-west1.firebasedatabase.app",
   projectId:"menzazaras",
   storageBucket:"menzazaras.firebasestorage.app",
   appId:"1:99283686644:web:a4bf53427784c87180faa1"
 };
 const CONFIGURED=!FIREBASE_CONFIG.databaseURL.includes("PROJEKT")&&!FIREBASE_CONFIG.apiKey.startsWith("IDE_");
-const ADMIN_USER="admin";              // az egyetlen zárt fiók
-const ADMIN_DOMAIN="menza-zaras.local"; // Firebase Auth: admin@menza-zaras.local
+const ADMIN_USER="admin";              // a felhasználónév, ha nincs élő kapcsolat
+const ADMIN_DOMAIN="menza-zaras.local"; // Firebase Auth: felhasználónév@menza-zaras.local
 const DEMO_LIMIT=2;
 const DB_ROOT="zarasok";
 
@@ -250,8 +262,8 @@ const MONEY_STEPS=[
   {key:"szep",        q:"SZÉP-kártya forgalom",              hint:"",                                       group:"minus"},
   {key:"cash",        q:"Készpénzes forgalom",               hint:"",                                       group:"minus"},
   {key:"nextOpening", q:"Következő nyitóösszeg a kasszában", hint:"",                                       group:"minus"},
-  {key:"salaries",    q:"Fizetések",                         hint:"Add meg, kinek mennyi fizetés ment ki.", type:"list", labelPh:"Név",   group:"minus"},
-  {key:"expenses",    q:"Kiadások",                          hint:"Opcionális. Ha nincs, hagyd üresen.",    type:"list", labelPh:"Mire",  group:"minus"}
+  {key:"salaries",    q:"Fizetések",                         hint:"Add meg, kinek mennyi fizetés ment ki.", type:"list", labelPh:"Név",  group:"minus"},
+  {key:"expenses",    q:"Kiadások",                          hint:"Opcionális. Ha nincs, hagyd üresen.",    type:"list", labelPh:"Mire", group:"minus"}
 ];
 const MONEY_KEYS=["opening","goorderz","foodbird","card","szep","cash","nextOpening"];
 const LABEL=Object.fromEntries(MONEY_STEPS.filter(s=>!s.type).map(s=>[s.key,s.q]));
@@ -283,8 +295,10 @@ const rnd=(a,b)=>Math.round((a+Math.random()*(b-a))/100)*100;
 const sumA=list=>(list||[]).reduce((a,x)=>a+(Number(x.amount)||0),0);
 const clean=list=>list.map(x=>({name:String(x.name||"").trim(),amount:parseAmount(x.amount)})).filter(x=>x.name||x.amount);
 const numVals=src=>{const v={};MONEY_KEYS.forEach(k=>v[k]=Math.round(parseAmount(src[k])));return v;};
+const splitLetters=t=>[...t].map((c,i)=>`<span style="--i:${i}">${c===" "?"&nbsp;":esc(c)}</span>`).join("");
 
 /* ===================== REKORDOK ===================== */
+// A végösszeg a rekordban a `diff` mezőben van: forgalom − levonások.
 function makeRecord({date,closer,values,salaries,expenses,closedAt}){
   const salSum=sumA(salaries),expSum=sumA(expenses);
   const gross=values.opening+values.goorderz+values.foodbird;
@@ -312,23 +326,25 @@ function seedDemo(){
 const S={
   screen:"splash",
   env:"live",            // live | test | demo
-  user:null,             // bejelentkezett admin
-  records:[],            // élő adatok
-  demoRecords:null,      // demó adatok (memóriában)
+  user:null,
+  records:[],
+  demoRecords:null,
   demoUsed:0,
   demoPhase:0,
-  auto:false,            // demó automata fut
+  auto:false,
   runId:0,
-  session:null,          // zárás állapota
+  session:null,
   stepIdx:0,
   saving:false,
   doneSaved:false,
-  apTab:"kimutatas",     // kimutatas | vezerlo
   period:"ma",           // ma | tegnap | het | honap | naptar
   range:{from:today(),to:today()},
-  draft:null,            // szerkesztett rekord
-  orig:null,             // eredeti rekord
-  loginErr:""
+  draft:null,
+  orig:null,
+  loginErr:"",
+  answering:false,
+  dir:1,
+  lastScreen:null
 };
 
 /* ===================== ADATOK ===================== */
@@ -353,7 +369,7 @@ function newId(){
   return (S.env==="demo"?"demo":"test")+uid();
 }
 async function persist(rec){
-  if(S.env==="test")return false;                 // teszt: semmi nem mentődik
+  if(S.env==="test")return false;
   if(S.env==="demo"){upsert(S.demoRecords,rec);return true;}
   if(!FB)throw new Error("Nincs élő kapcsolat.");
   await FB.D.set(dbRef(`${DB_ROOT}/${rec.date}/${rec.id}`),JSON.parse(JSON.stringify(rec)));
@@ -425,6 +441,10 @@ function banner(){
   }
   return "";
 }
+
+const dRow=(label,sign,v,bal,i)=>`<div class="item dstep" style="--i:${i};--c:${sign==="+"?"var(--teal)":"var(--red)"}">
+  <div class="info"><b>${esc(label)}</b><small>Futó egyenleg: ${ft(bal)}</small></div>
+  <div class="amt ${sign==="+"?"":"neg"}">${sign} ${ft(v)}</div></div>`;
 
 const screens={
   splash:()=>`<div class="splash"><div>${logo()}<p class="tagline">Zárás</p></div></div>`,
@@ -499,7 +519,7 @@ const screens={
     const s=S.session;
     const money=MONEY_STEPS.filter(x=>!x.type).map((x,i)=>`<div class="rv" style="--i:${i}"><span>${x.q}</span><b>${ft(parseAmount(s.values[x.key]))}</b></div>`).join("");
     const list=k=>s[k].length?s[k].map(x=>`<div class="rv sub"><span>${esc(x.name)||"—"}</span><b>${ft(parseAmount(x.amount))}</b></div>`).join(""):`<div class="rv sub"><span>Nincs</span><b>—</b></div>`;
-    const checks=CHECKS.map(c=>`<div class="rv"><span>${c.q}</span><b class="ok">Igen ✓</b></div>`).join("");
+    const checks=CHECKS.map((c,i)=>`<div class="rv" style="--i:${i}"><span>${c.q}</span><b class="ok">Igen ✓</b></div>`).join("");
     return `${banner()}${top("Ellenőrzés a zárás előtt",esc(s.closer))}<main class="wrap">
       <div class="card"><h3 class="serif" style="font-weight:400;margin:0 0 8px">Pénzügyek</h3>${money}
         <div class="rv"><span>Fizetések</span><b></b></div>${list("salaries")}
@@ -540,40 +560,56 @@ const screens={
   admin:()=>{
     if(!S.user&&S.env==="live")return screens.login();
     const recs=periodRecords(),s=sums(recs),list=sortedRecs(recs);
-    const tabs=`<div class="seg">${[["kimutatas","Kimutatás"],["vezerlo","Vezérlőpult"]].map(([k,l])=>`<button class="${S.apTab===k?"on":""}" data-act="apTab" data-k="${k}">${l}</button>`).join("")}</div>`;
     const right=`<button class="icon" data-act="logout" title="Kijelentkezés">${ICON_OUT}</button>`;
-    let body;
-    if(S.apTab==="vezerlo"){
-      body=`
-        <h3 class="sec">Fejlesztői menü</h3>
-        <div class="devcard"><div class="dc-text"><b>Teszt mód</b><small>A zárás végigpróbálása. Semmi nem mentődik.</small></div>
-          <button class="btn ok" data-act="testmode">Indítás</button></div>
-        <div class="devcard"><div class="dc-text"><b>Demó</b><small>Alkalmazotti nézet, majd admin nézet, egymás után. Semmi nem mentődik. Még ${demoLeft()}× indítható.</small></div>
-          <button class="btn grad" data-act="demo" ${demoLeft()>0&&S.env==="live"?"":"disabled"}>Indítás</button></div>
-        <h3 class="sec">Fiók</h3>
-        <div class="card"><div class="rv"><span>Belépve</span><b>${esc(S.user?.name||"–")}</b></div>
-          <button class="btn ghost block" style="margin-top:14px" data-act="logout">Kijelentkezés</button></div>`;
-    }else{
-      const bars=(()=>{
-        const byDay={};list.forEach(r=>byDay[r.date]=(byDay[r.date]||0)+r.gross);
-        const days=Object.keys(byDay).sort(),max=Math.max(1,...Object.values(byDay));
-        if(!days.length)return `<div class="empty">Nincs adat ebben az időszakban.</div>`;
-        return `<div class="bars">${days.map((d,i)=>`<div class="bar" title="${shortDate(d)}: ${ft(byDay[d])}"><div class="fill" style="--h:${(byDay[d]/max*100).toFixed(1)}%;--d:${i*70}ms"></div><span>${shortDate(d)}</span></div>`).join("")}</div>`;
-      })();
-      const items=list.length?list.map((r,i)=>`
-        <button class="item rise" style="--i:${i};--c:${r.diff<0?"var(--red)":"var(--teal)"}" data-act="openRec" data-id="${esc(r.id)}" data-date="${r.date}">
-          <div class="info"><b>${esc(r.closer)} · ${shortDate(r.date)}</b>
-            <small>${r.closedAt||""} · Forgalom ${ft(r.gross)} · Fizetés ${ft(r.salSum)}${r.hist.length?` · <em class="mod">módosítva</em>`:""}</small></div>
-          <div class="amt ${r.diff<0?"neg":""}">${ft(r.diff)}</div></button>`).join(""):`<div class="empty">Nincs zárás ebben az időszakban.</div>`;
-      const periodSeg=`<div class="seg">${[["ma","Ma"],["tegnap","Tegnap"],["het","Hét"],["honap","Hónap"],["naptar","Naptár"]].map(([k,l])=>`<button class="${S.period===k?"on":""}" data-act="period" data-p="${k}">${l}</button>`).join("")}</div>
-        ${S.period==="naptar"?`<div class="range"><label>-tól<input class="field" type="date" value="${S.range.from}" max="${today()}" data-in="range" data-k="from"></label><label>-ig<input class="field" type="date" value="${S.range.to}" max="${today()}" data-in="range" data-k="to"></label></div>`:""}`;
-      body=`
+
+    const demoCard=demoLeft()>0?`<section class="devcard rise">
+        <div class="dc-text"><b>Demó</b><small>Alkalmazotti nézet, majd admin nézet, egymás után. Semmi nem mentődik. Még ${demoLeft()}× indítható.</small></div>
+        <button class="btn grad" data-act="demo" ${S.env==="live"?"":"disabled"}>Indítás</button></section>`:"";
+    const testRow=`<div class="fejl"><button class="btn ghost sm" data-act="testmode">Teszt mód · nem ment</button></div>`;
+
+    const periodSeg=`<div class="seg">${[["ma","Ma"],["tegnap","Tegnap"],["het","Hét"],["honap","Hónap"],["naptar","Naptár"]].map(([k,l])=>`<button class="${S.period===k?"on":""}" data-act="period" data-p="${k}">${l}</button>`).join("")}</div>
+      ${S.period==="naptar"?`<div class="range"><label>-tól<input class="field" type="date" value="${S.range.from}" max="${today()}" data-in="range" data-k="from"></label><label>-ig<input class="field" type="date" value="${S.range.to}" max="${today()}" data-in="range" data-k="to"></label></div>`:""}`;
+
+    // Ma fül: legelöl a mai zárások gombjai (ki zárt, dátum, idő)
+    const deriveBtns=S.period==="ma"
+      ?(list.length?list.map((r,i)=>`<button class="item rise derive-btn" style="--i:${i};--c:var(--orange)" data-act="derive" data-id="${esc(r.id)}">
+          <div class="info"><b>${esc(r.closer)}</b><small>${shortDate(r.date)} · ${esc(r.closedAt||"")}</small></div>
+          <div class="amt">Levezetés</div></button>`).join(""):`<div class="empty">Ma még nincs zárás.</div>`)
+      :"";
+
+    // grafikonok
+    const compo=(()=>{
+      if(!recs.length)return `<div class="empty">Nincs adat ebben az időszakban.</div>`;
+      const items=[["Bankkártya",s.card],["SZÉP",s.szep],["Készpénz",s.cash],["Fizetések",s.sal],["Kiadások",s.exp]];
+      const max=Math.max(1,s.gross);
+      return items.map(([l,v],i)=>`<div class="hrow"><span>${l}</span><div class="htrack"><i style="--w:${(Math.max(0,v)/max*100).toFixed(1)}%;--i:${i}"></i></div><b>${ft(v)}</b></div>`).join("");
+    })();
+    const daily=(()=>{
+      const by={};
+      recs.forEach(r=>{const x=by[r.date]||(by[r.date]={g:0,v:0});x.g+=r.gross;x.v+=r.diff;});
+      const days=Object.keys(by).sort();
+      if(!days.length)return `<div class="empty">Nincs adat ebben az időszakban.</div>`;
+      const max=Math.max(1,...days.map(d=>Math.max(by[d].g,Math.abs(by[d].v))));
+      return `<div class="legend"><span class="lg a"></span>Forgalom<span class="lg b"></span>Végösszeg</div>
+        <div class="bars">${days.map((d,i)=>`<div class="bar" title="${shortDate(d)} · forgalom ${ft(by[d].g)} · végösszeg ${ft(by[d].v)}">
+          <div class="pair">
+            <div class="fill" style="--h:${(by[d].g/max*100).toFixed(1)}%;--d:${i*60}ms"></div>
+            <div class="fill fill-b" style="--h:${(Math.max(0,by[d].v)/max*100).toFixed(1)}%;--d:${i*60+120}ms"></div>
+          </div><span>${shortDate(d)}</span></div>`).join("")}</div>`;
+    })();
+
+    const items=list.length?list.map((r,i)=>`
+      <button class="item rise" style="--i:${i};--c:${r.diff<0?"var(--red)":"var(--teal)"}" data-act="openRec" data-id="${esc(r.id)}">
+        <div class="info"><b>${esc(r.closer)} · ${shortDate(r.date)}</b>
+          <small>${r.closedAt||""} · Forgalom ${ft(r.gross)} · Fizetés ${ft(r.salSum)}${r.hist.length?` · <em class="mod">módosítva</em>`:""}</small></div>
+        <div class="amt ${r.diff<0?"neg":""}">${ft(r.diff)}</div></button>`).join(""):`<div class="empty">Nincs zárás ebben az időszakban.</div>`;
+
+    return `${banner()}${top("Vezetői nézet","Admin",right)}
+      <main class="wrap" style="margin-top:8px">
+        ${demoCard}${testRow}
         ${periodSeg}
-        <div class="toolbar-row small muted" style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;gap:8px">
-          <span>${periodLabel()} · ${recs.length} zárás</span>
-          ${S.env==="live"?`<button class="btn sm pill" data-act="refresh">Frissítés</button>`:""}
-        </div>
-        <div class="kpi wide total-first" style="margin-top:18px"><span>Különbözet · végösszeg</span><b>${ft(s.diff)}</b></div>
+        ${deriveBtns?`<div class="items" style="margin-top:14px">${deriveBtns}</div>`:""}
+        <div class="kpi wide dfinal" style="--i:0"><span>Végösszeg</span><b>${ft(s.diff)}</b></div>
         <div class="kpis">
           <div class="kpi"><span>Forgalom</span><b>${ft(s.gross)}</b></div>
           <div class="kpi" style="--i:1"><span>Bankkártya</span><b>${ft(s.card)}</b></div>
@@ -582,16 +618,39 @@ const screens={
           <div class="kpi" style="--i:4"><span>Fizetések</span><b>${ft(s.sal)}</b></div>
           <div class="kpi" style="--i:5"><span>Kiadások</span><b>${ft(s.exp)}</b></div>
         </div>
-        <section class="card"><h3 class="sec" style="margin-top:0">Napi forgalom</h3>${bars}</section>
+        <section class="card"><h3 class="sec" style="margin-top:0">Forgalom összetétele</h3>${compo}</section>
+        <section class="card"><h3 class="sec" style="margin-top:0">Napi forgalom és végösszeg</h3>${daily}</section>
         <h3 class="sec">Zárások</h3>
         <div class="items">${items}</div>
         <h3 class="sec">Export</h3>
-        <div class="exports"><button class="btn ok" data-act="exportXlsx">Excel</button><button class="btn grad" data-act="exportPdf">PDF</button></div>`;
-    }
-    return `${banner()}${top(S.env==="demo"?"Demó · admin":"Vezetői nézet","Admin",right)}
-      <main class="wrap" style="margin-top:8px">
-        ${tabs}
-        ${body}
+        <div class="exports"><button class="btn ok" data-act="exportXlsx">Excel</button><button class="btn grad" data-act="exportPdf">PDF</button></div>
+        <div style="height:24px"></div>
+      </main>`;
+  },
+
+  derive:()=>{
+    const r=S.orig,v=r.values;
+    const plus=[{l:"Nyitó összeg",v:v.opening},{l:"GoOrderz",v:v.goorderz},{l:"Foodbird",v:v.foodbird}];
+    const minus=[
+      {l:"Bankkártya",v:v.card},{l:"SZÉP",v:v.szep},{l:"Készpénz",v:v.cash},{l:"Következő nyitó",v:v.nextOpening},
+      ...r.salaries.map(x=>({l:"Fizetés · "+x.name,v:x.amount})),
+      ...r.expenses.map(x=>({l:"Kiadás · "+x.name,v:x.amount}))
+    ];
+    let bal=0;
+    const plusHtml=plus.map((x,i)=>{bal+=x.v;return dRow(x.l,"+",x.v,bal,i);}).join("");
+    const gross=bal;
+    let b2=gross;
+    const minusHtml=minus.map((x,i)=>{b2-=x.v;return dRow(x.l,"−",x.v,b2,i+plus.length);}).join("");
+    return `${banner()}${top(`${esc(r.closer)} · ${shortDate(r.date)} · ${esc(r.closedAt||"")}`,"Levezetés",`<button class="icon" data-act="adminBack" aria-label="Vissza">${ICON_BACK}</button>`)}
+      <main class="wrap">
+        <h3 class="sec" style="margin-top:8px">Forgalom</h3>
+        <div class="items">${plusHtml}</div>
+        <div class="kpi" style="margin-top:12px"><span>Forgalom összesen</span><b>${ft(gross)}</b></div>
+        <h3 class="sec">Levonások</h3>
+        <div class="items">${minusHtml}</div>
+        <div class="kpi wide dfinal" style="margin-top:18px"><span>Végösszeg</span><b>${ft(r.diff)}</b></div>
+        <p class="muted small" style="margin-top:10px">Végösszeg = forgalom − levonások. A jobb oldali szám a futó egyenleg.</p>
+        <button class="linkbtn" data-act="adminBack">← Vissza a kimutatáshoz</button>
       </main>`;
   },
 
@@ -610,7 +669,7 @@ const screens={
       <main class="wrap">
         <div class="kpis" style="margin-top:8px">
           <div class="kpi"><span>Forgalom</span><b>${ft(p.gross)}</b></div>
-          <div class="kpi" style="--i:1"><span>Különbözet</span><b>${ft(p.diff)}</b></div>
+          <div class="kpi" style="--i:1"><span>Végösszeg</span><b>${ft(p.diff)}</b></div>
         </div>
         <div class="card">
           <label>Záró</label>
@@ -656,7 +715,6 @@ function toast(msg){
 }
 
 /* ===================== EFFEKTEK ===================== */
-const splitLetters=t=>[...t].map((c,i)=>`<span style="--i:${i}">${c===" "?"&nbsp;":esc(c)}</span>`).join("");
 function tween(el,from,to,ms,fmt=ft){
   const t0=performance.now();
   const f=now=>{
@@ -710,13 +768,17 @@ async function finishClosing(){
 }
 
 /* ===================== ADMIN: RÉSZLETEK, SZERKESZTÉS ===================== */
-function openRec(id,date){
+function openRec(id){
   const r=recsSource().find(x=>x.id===id);if(!r)return;
   S.orig=r;
   S.draft={closer:r.closer,values:Object.fromEntries(MONEY_KEYS.map(k=>[k,String(r.values[k]??0)])),
     salaries:r.salaries.map(x=>({name:x.name,amount:String(x.amount)})),
     expenses:r.expenses.map(x=>({name:x.name,amount:String(x.amount)}))};
   S.screen="detail";render();
+}
+function openDerive(id){
+  const r=recsSource().find(x=>x.id===id);if(!r)return;
+  S.orig=r;S.screen="derive";render();
 }
 async function saveDetail(){
   const d=S.draft,o=S.orig;
@@ -735,7 +797,7 @@ async function saveDetail(){
     await persist(rec);
     S.orig=rec;
     toast("Mentve. A módosítás naplózva.");
-    S.screen="admin";S.apTab="kimutatas";
+    S.screen="admin";
   }catch(e){toast("Mentési hiba: "+e.message);}
   render();
 }
@@ -776,19 +838,19 @@ async function runDemo(){
   await sleep(2200);if(!alive())return;
 
   // 2. fázis: admin nézet
-  S.demoPhase=2;S.screen="admin";S.apTab="kimutatas";S.period="ma";render();
+  S.demoPhase=2;S.screen="admin";S.period="ma";render();
   await sleep(1800);if(!alive())return;
   const last=recsSource().find(r=>r.date===today()&&r.id.startsWith("demo"));
-  if(last){openRec(last.id);await sleep(2200);if(!alive())return;}
-  S.auto=false;S.screen="admin";S.apTab="kimutatas";S.orig=null;render();
+  if(last){openDerive(last.id);await sleep(2600);if(!alive())return;}
+  S.auto=false;S.screen="admin";S.orig=null;render();
 }
 function exitDemo(){
   S.runId++;S.auto=false;S.env="live";S.demoRecords=null;S.demoPhase=0;S.session=null;
-  S.screen="admin";S.apTab="vezerlo";render();
+  S.screen="admin";render();
 }
 function exitEnv(){
   S.runId++;S.auto=false;S.env="live";S.session=null;
-  S.screen="admin";S.apTab="vezerlo";render();
+  S.screen="admin";render();
 }
 
 /* ===================== EXPORT ===================== */
@@ -797,7 +859,7 @@ function exportXlsx(){
   if(!list.length)return toast("Nincs exportálható adat.");
   if(!window.XLSX)return toast("Az Excel-modul nem töltött be.");
   const wb=XLSX.utils.book_new();
-  const rows=list.map(r=>({"Dátum":r.date,"Záró":r.closer,"Zárás":r.closedAt||"","Nyitó":r.values.opening,"GoOrderz":r.values.goorderz,"Foodbird":r.values.foodbird,"Forgalom":r.gross,"Bankkártya":r.values.card,"SZÉP":r.values.szep,"Készpénz":r.values.cash,"Következő nyitó":r.values.nextOpening,"Fizetések":r.salSum,"Kiadások":r.expSum,"Különbözet":r.diff,"Módosítva":r.hist.length?"igen":"nem"}));
+  const rows=list.map(r=>({"Dátum":r.date,"Záró":r.closer,"Zárás":r.closedAt||"","Nyitó":r.values.opening,"GoOrderz":r.values.goorderz,"Foodbird":r.values.foodbird,"Forgalom":r.gross,"Bankkártya":r.values.card,"SZÉP":r.values.szep,"Készpénz":r.values.cash,"Következő nyitó":r.values.nextOpening,"Fizetések":r.salSum,"Kiadások":r.expSum,"Végösszeg":r.diff,"Módosítva":r.hist.length?"igen":"nem"}));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),"Zárások");
   const pay=[];list.forEach(r=>r.salaries.forEach(x=>pay.push({"Dátum":r.date,"Név":x.name,"Összeg":x.amount})));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(pay.length?pay:[{"Dátum":"","Név":"","Összeg":""}]),"Fizetések");
@@ -827,7 +889,7 @@ function exportPdf(){
     @media print{body{margin:14mm}}</style></head><body>
     <div class="top">${logo()}<div><h1>Zárási kimutatás</h1><div class="sub">${esc(periodLabel())} · összegek Ft-ban</div></div></div>
     <div class="bar"></div>
-    <table><thead><tr><th>Dátum</th><th>Záró</th><th class="n">Forgalom</th><th class="n">Bankkártya</th><th class="n">SZÉP</th><th class="n">Készpénz</th><th class="n">Fizetések</th><th class="n">Kiadások</th><th class="n">Különbözet</th></tr></thead>
+    <table><thead><tr><th>Dátum</th><th>Záró</th><th class="n">Forgalom</th><th class="n">Bankkártya</th><th class="n">SZÉP</th><th class="n">Készpénz</th><th class="n">Fizetések</th><th class="n">Kiadások</th><th class="n">Végösszeg</th></tr></thead>
     <tbody>${list.map(row).join("")}</tbody>
     <tfoot><tr class="tot"><td colspan="2">Összesen</td><td class="n">${fn(s.gross)}</td><td class="n">${fn(s.card)}</td><td class="n">${fn(s.szep)}</td><td class="n">${fn(s.cash)}</td><td class="n">${fn(s.sal)}</td><td class="n">${fn(s.exp)}</td><td class="n">${fn(s.diff)}</td></tr></tfoot></table>
     </body></html>`;
@@ -845,7 +907,7 @@ async function doLogin(u,p){
 }
 async function logout(){
   if(FB&&S.env==="live"){try{await FB.A.signOut(FB.auth);}catch(e){}}
-  S.user=null;S.records=[];S.demoUsed=0;S.screen="home";S.apTab="kimutatas";render();
+  S.user=null;S.records=[];S.demoUsed=0;S.screen="home";render();
 }
 
 /* ===================== ESEMÉNYEK ===================== */
@@ -853,7 +915,7 @@ const actions={
   home:()=>goHome(),
   admin:()=>{
     S.loginErr="";
-    if(S.user){S.screen="admin";S.apTab="kimutatas";render();return;}
+    if(S.user){S.screen="admin";render();return;}
     S.screen="login";render();
   },
   startclose:()=>startClose("live"),
@@ -897,11 +959,11 @@ const actions={
   backMoney:()=>{S.stepIdx=MONEY_STEPS.length-1;S.screen="money";render();},
   editFromStart:()=>{S.stepIdx=0;S.screen="money";render();},
   finish:()=>finishClosing(),
-  apTab:el=>{S.apTab=el.dataset.k;render();},
   period:el=>{S.period=el.dataset.p;render();},
   refresh:async()=>{try{await loadLive();toast("Frissítve.");}catch(e){toast("Hiba: "+e.message);}render();},
-  openRec:el=>openRec(el.dataset.id,el.dataset.date),
-  adminBack:()=>{S.screen="admin";S.apTab="kimutatas";S.orig=null;render();},
+  openRec:el=>openRec(el.dataset.id),
+  derive:el=>openDerive(el.dataset.id),
+  adminBack:()=>{S.screen="admin";S.orig=null;render();},
   saveDetail:()=>saveDetail(),
   dAdd:el=>{S.draft[el.dataset.list].push({name:"",amount:""});render();},
   dDel:el=>{S.draft[el.dataset.list].splice(+el.dataset.i,1);render();},
@@ -944,12 +1006,11 @@ document.addEventListener("keydown",e=>{
 document.addEventListener("submit",async e=>{
   e.preventDefault();
   const f=e.target;if(f.dataset.form!=="login")return;
-  const err=f.querySelector(".err");
   try{
     await doLogin(f.elements.u.value.trim(),f.elements.p.value);
-    S.user={name:ADMIN_USER};S.loginErr="";
+    S.user={name:f.elements.u.value.trim()};S.loginErr="";
     if(FB)await loadLive();
-    S.screen="admin";S.apTab="kimutatas";
+    S.screen="admin";
   }catch(ex){
     const c=ex.code||"";
     S.loginErr=c.startsWith("auth/")||c.includes("invalid")?"Hibás felhasználónév vagy jelszó.":"Hiba: "+(ex.message||c);
@@ -961,11 +1022,11 @@ document.addEventListener("submit",async e=>{
 if(FB){
   FB.A.onAuthStateChanged(FB.auth,async user=>{
     if(user){
-      S.user={name:ADMIN_USER};
+      S.user={name:user.email?.split("@")[0]||ADMIN_USER};
       try{await loadLive();}catch(e){}
       if(S.screen==="login"){S.screen="admin";render();}
       else if(S.screen==="admin"&&S.env==="live"){render();}
-    }else if(S.user&&!S.user.offline){
+    }else if(S.user){
       S.user=null;S.records=[];
       if(S.screen==="admin"&&S.env==="live"){S.screen="home";render();}
     }
