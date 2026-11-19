@@ -292,8 +292,6 @@ label{display:block;font-size:13px;color:var(--mute);margin:14px 0 6px;letter-sp
 .plate .hand{filter:drop-shadow(0 3px 2px rgba(30,27,24,.3))}
 .digi{font-family:"DM Serif Display",Georgia,serif;font-size:clamp(40px,11vw,54px);line-height:1;margin-top:12px;font-variant-numeric:tabular-nums}
 .digi small{font-size:.42em;color:var(--mute);margin-left:4px}
-.legendtxt{font-size:12px;color:var(--mute);margin:8px 0 0;letter-spacing:.02em}
-.legendtxt i{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 5px 1px 10px;vertical-align:middle}
 
 /* teljes képernyős, esti köszönés */
 .night{position:fixed;inset:0;z-index:0;display:grid;place-items:center;text-align:center;padding:24px 22px 140px;background:var(--cream);color:var(--ink);animation:nightText 2.4s .9s forwards;overflow:hidden}
@@ -743,7 +741,6 @@ const screens={
         <div class="hero-top"><span>Pontos idő</span><span class="live" id="date"></span></div>
         ${plateClock()}
         <div class="digi" id="digi">--:--<small>--</small></div>
-        <p class="legendtxt"><i style="background:#E9A21B"></i>villa · óra<i style="background:#17B69A"></i>kanál · perc<i style="background:#E01B0F"></i>kés · mp</p>
       </section>
       <nav class="dock"><button class="btn grad block big" data-act="startclose">ZÁRÁS INDÍTÁSA</button></nav>
     </main>`,
