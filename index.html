@@ -171,6 +171,20 @@ label{display:block;font-size:13px;color:var(--mute);margin:14px 0 6px;letter-sp
 .devcard small{opacity:.75;font-size:13px;line-height:1.4}
 .devcard .btn{min-height:46px;padding:10px 18px;border-radius:14px;white-space:nowrap}
 
+/* ---- mozgás: képernyőváltás, kérdések, zárás ---- */
+#app.fwd{animation:slideF .6s cubic-bezier(.2,.8,.2,1) both}
+#app.back{animation:slideB .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes slideF{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes slideB{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
+.rv{animation:rise .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*45ms)}
+.row{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+.btn.grad.big{animation:ring 2.4s ease-out infinite}
+.qcard.pulse-ok{animation:okPulse .45s ease-out}
+@keyframes okPulse{0%{transform:scale(1);box-shadow:var(--shadow)}40%{transform:scale(1.02);box-shadow:0 0 0 6px rgba(23,182,154,.35),var(--shadow)}100%{transform:none;box-shadow:var(--shadow)}}
+.hero .num{animation:rise .8s .2s both}
+.confetti{position:fixed;width:10px;height:14px;border-radius:3px;z-index:50;pointer-events:none;animation:confetti 1.8s cubic-bezier(.1,.7,.3,1) forwards}
+@keyframes confetti{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 @media(max-width:420px){.kpis{grid-template-columns:1fr}}
 </style>
 </head>
@@ -460,14 +474,14 @@ const screens={
     const idx=S.session.checkIdx,c=CHECKS[idx];
     return `${banner()}${top("Zárás · "+S.session.closer,"Ellenőrzés")}<main class="wrap">
       <div class="progress"><span>${idx+1} / ${CHECKS.length}</span><div class="bar2"><i style="width:${(idx+1)/CHECKS.length*100}%"></i></div></div>
-      <div class="card"><p class="kicker">Ellenőrzés</p><h2 class="serif" style="font-size:28px;margin:6px 0">${c.q}</h2>
+      <div class="card qcard"><p class="kicker">Ellenőrzés</p><h2 class="serif" style="font-size:28px;margin:6px 0">${c.q}</h2>
         <div class="yn"><button class="btn yes big" data-act="answer" data-v="1">IGEN</button><button class="btn danger big" data-act="answer" data-v="0">NEM</button></div></div>
       <button class="linkbtn" data-act="backMoney">← Vissza a pénzügyi kérdésekhez</button></main>`;
   },
 
   review:()=>{
     const s=S.session;
-    const money=MONEY_STEPS.filter(x=>!x.type).map(x=>`<div class="rv"><span>${x.q}</span><b>${ft(parseAmount(s.values[x.key]))}</b></div>`).join("");
+    const money=MONEY_STEPS.filter(x=>!x.type).map((x,i)=>`<div class="rv" style="--i:${i}"><span>${x.q}</span><b>${ft(parseAmount(s.values[x.key]))}</b></div>`).join("");
     const list=k=>s[k].length?s[k].map(x=>`<div class="rv sub"><span>${esc(x.name)||"—"}</span><b>${ft(parseAmount(x.amount))}</b></div>`).join(""):`<div class="rv sub"><span>Nincs</span><b>—</b></div>`;
     const checks=CHECKS.map(c=>`<div class="rv"><span>${c.q}</span><b class="ok">Igen ✓</b></div>`).join("");
     return `${banner()}${top("Ellenőrzés a zárás előtt",esc(s.closer))}<main class="wrap">
@@ -600,11 +614,17 @@ const screens={
 
 /* ===================== RENDER ===================== */
 function render(){
-  $("#app").innerHTML=screens[S.screen]();
+  const app=$("#app");
+  const changed=S.lastScreen!==S.screen;
+  S.lastScreen=S.screen;
+  app.className=changed?(S.dir<0?"back":"fwd"):"";
+  app.innerHTML=screens[S.screen]();
   const f=document.querySelector("[data-focus]");
   if(f&&!S.auto)f.focus({preventScroll:true});
   S.justAdded=false;
   updateClock();
+  animateKpis();
+  if(S.screen==="done"&&S.env==="live"&&S.doneSaved)confetti();
 }
 function updateClock(){
   const c=$("#clock"),d=$("#date"),now=new Date();
@@ -616,6 +636,41 @@ setInterval(updateClock,1000);
 function toast(msg){
   const t=$("#toast");t.textContent=msg;t.classList.add("on");
   clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),2600);
+}
+
+/* ===================== EFFEKTEK ===================== */
+function tween(el,from,to,ms,fmt=ft){
+  const t0=performance.now();
+  const f=now=>{
+    const p=Math.min(1,(now-t0)/ms),e=1-Math.pow(1-p,3);
+    el.textContent=fmt(from+(to-from)*e);
+    if(p<1)requestAnimationFrame(f);
+  };
+  requestAnimationFrame(f);
+}
+function animateKpis(){
+  document.querySelectorAll(".kpi b").forEach(el=>{
+    const raw=el.textContent;
+    const n=parseInt(raw.replace(/[^0-9]/g,""))||0;
+    if(n)tween(el,0,raw.includes("-")?-n:n,900,ft);
+  });
+}
+function confetti(){
+  const cols=["#E9A21B","#17B69A","#E01B0F","#1E1B18","#FBF8F1"];
+  for(let i=0;i<64;i++){
+    const s=document.createElement("span");
+    s.className="confetti";
+    s.style.left=(40+Math.random()*20)+"vw";
+    s.style.top="40vh";
+    s.style.background=cols[i%cols.length];
+    s.style.setProperty("--dx",(Math.random()*240-120)+"px");
+    s.style.setProperty("--dy",(-220-Math.random()*320)+"px");
+    s.style.setProperty("--rot",(Math.random()*720-360)+"deg");
+    s.style.animationDelay=(Math.random()*.2)+"s";
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),2600);
+  }
+  if(navigator.vibrate)navigator.vibrate([20,40,20]);
 }
 
 /* ===================== ZÁRÁS (alkalmazotti) ===================== */
@@ -689,6 +744,7 @@ async function runDemo(){
   S.stepIdx=7;
   S.session.salaries.push({name:"Bence",amount:"9500"});render();await sleep(600);if(!alive())return;
   S.session.salaries.push({name:"Csilla",amount:"8200"});render();await sleep(600);if(!alive())return;
+  S.session.salaries.push({name:"Dóra",amount:"7400"});render();await sleep(600);if(!alive())return;
   S.stepIdx=8;
   S.session.expenses.push({name:"Zöldség",amount:"6400"});render();await sleep(700);if(!alive())return;
 
@@ -788,14 +844,20 @@ const actions={
     if(!v.trim())return toast("Add meg a neved.");
     S.session.closer=v.trim();S.stepIdx=0;S.screen="money";render();
   },
-  prevStep:()=>{if(S.stepIdx>0){S.stepIdx--;render();}else{S.screen="closer";render();}},
+  prevStep:()=>{S.dir=-1;if(S.stepIdx>0){S.stepIdx--;render();}else{S.screen="closer";render();}},
   nextStep:()=>{
     const st=MONEY_STEPS[S.stepIdx];
     if(st.type!=="list"){
       const v=S.session.values[st.key];
       if(v===undefined||String(v).trim()==="")return toast("Add meg az összeget (0 is lehet).");
     }
-    if(S.stepIdx<MONEY_STEPS.length-1){S.stepIdx++;}
+    S.dir=1;
+    if(S.stepIdx<MONEY_STEPS.length-1){
+      S.stepIdx++;
+      if(MONEY_STEPS[S.stepIdx].key==="salaries"&&!S.session.salaries.length){
+        for(let k=0;k<3;k++)S.session.salaries.push({name:"",amount:""});
+      }
+    }
     else{S.session.checkIdx=0;S.session.blocked=false;S.screen="checks";}
     render();
   },
@@ -803,9 +865,15 @@ const actions={
   delRow:el=>{S.session[el.dataset.list].splice(+el.dataset.i,1);render();},
   answer:el=>{
     if(el.dataset.v==="0"){S.session.blocked=true;return render();}
-    S.session.checkIdx++;
-    if(S.session.checkIdx>=CHECKS.length)S.screen="review";
-    render();
+    if(S.answering)return;
+    S.answering=true;
+    document.querySelector(".qcard")?.classList.add("pulse-ok");
+    setTimeout(()=>{
+      S.answering=false;
+      S.session.checkIdx++;
+      if(S.session.checkIdx>=CHECKS.length)S.screen="review";
+      render();
+    },420);
   },
   unblock:()=>{S.session.blocked=false;render();},
   backMoney:()=>{S.stepIdx=MONEY_STEPS.length-1;S.screen="money";render();},
