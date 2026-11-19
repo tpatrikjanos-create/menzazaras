@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Menza – Zárás</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#E6DEC8;--ink:#1d1a14;--or:#E8A010;--te:#14B8A0;--re:#D91E0E;--card:#fbf7ec}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 20% 0%,#f3ecd9,#E6DEC8 60%);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);min-height:100vh}
+.app{max-width:640px;margin:0 auto;padding:18px 16px 40px;min-height:100vh;display:flex;flex-direction:column;gap:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.clockbox{text-align:right;font-variant-numeric:tabular-nums;margin-left:auto}
+.clockbox #clock{display:block;font-size:26px;font-weight:700}
+.clockbox #date{font-size:14px;color:#5b5140}
+.stage{flex:1;display:flex;flex-direction:column;gap:16px;justify-content:center}
+.screen{display:flex;flex-direction:column;gap:18px;animation:rise .5s ease-out both}
+h2{font-family:Georgia,"Times New Roman",serif;font-size:30px;margin:6px 0;line-height:1.2}
+h3{font-family:Georgia,"Times New Roman",serif;margin:0 0 10px}
+.kicker{text-transform:uppercase;letter-spacing:.12em;font-size:12px;color:#7a6d55;margin:0}
+.muted{color:#6b604b}
+.small{font-size:13px}
+.err{color:#9b1d10;font-weight:700;font-size:15px;min-height:20px}
+.card{background:var(--card);border-radius:22px;padding:22px;box-shadow:0 10px 30px rgba(60,45,20,.12)}
+.btn{font:inherit;border:0;border-radius:16px;padding:14px 18px;font-weight:700;cursor:pointer;color:#fff;font-size:17px;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn-big{min-height:76px;font-size:24px;width:100%;letter-spacing:.04em}
+.btn-or{background:var(--or);color:#1d1a14}
+.btn-te{background:var(--te);color:#06302a}
+.btn-re{background:var(--re)}
+.btn-ghost{background:transparent;color:var(--ink);border:2px solid #b9ab8a}
+.btn.sm{padding:8px 14px;font-size:16px}
+.linkbtn{background:none;border:0;color:#5b5140;text-decoration:underline;font:inherit;cursor:pointer;padding:6px}
+.row2{display:flex;gap:10px}.row2 .btn{flex:1}
+.badge{display:inline-block;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:.04em;align-self:flex-start}
+.badge.dev{background:#fbd9a0;color:#6b3d00}
+.badge.live{background:#bfeee6;color:#064a40}
+input{width:100%;font:inherit;font-size:22px;padding:14px 16px;border-radius:14px;border:2px solid #cbbf9f;background:#fffdf6;color:var(--ink)}
+input:focus{outline:none;border-color:var(--te);box-shadow:0 0 0 4px rgba(20,184,160,.2)}
+.field-label{font-weight:700;margin-bottom:6px;display:block}
+.amount{display:flex;align-items:center;gap:10px;margin-top:14px}
+.amount input{font-size:34px;font-weight:700;text-align:right}
+.amount span{font-size:22px;font-weight:700}
+.progress{display:flex;align-items:center;gap:12px;font-weight:700}
+.progress .bar{flex:1;height:10px;background:#d6cbb0;border-radius:99px;overflow:hidden}
+.progress .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--or),var(--te),var(--re));transition:width .4s}
+.nav{display:flex;gap:12px}.nav .btn{flex:1}
+.row{display:grid;grid-template-columns:1.3fr 1fr auto;gap:8px;margin-bottom:10px}
+.row .x{background:#eadfc8;border:0;border-radius:12px;font-size:22px;padding:0 14px;cursor:pointer}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.block{text-align:center;border:3px solid var(--re)}
+.stop{width:84px;height:84px;margin:0 auto;border-radius:50%;background:var(--re);color:#fff;font-size:48px;font-weight:900;display:grid;place-items:center;animation:pop .5s both}
+.fix{font-size:24px;font-weight:700;color:#7a1206}
+.rv{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed #d9ccae}
+.rv b{font-variant-numeric:tabular-nums;text-align:right}
+.rv.sub{padding-left:14px;font-size:15px}
+.ok{color:#0b7a68;font-weight:700}
+.warn{color:#c0392b;font-weight:700}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{padding:10px 8px;text-align:left;border-bottom:1px solid #e3d9c2}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#6b604b}
+td:nth-child(n+3),th:nth-child(n+3){text-align:right}
+tr.click{cursor:pointer}
+tr.click:hover{background:#f3ead5}
+.detail td{background:#f7f0de;text-align:left}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:14px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{flex:1;min-width:70px;padding:12px;border-radius:14px;border:2px solid #b9ab8a;background:transparent;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:var(--card);border-radius:18px;padding:16px;box-shadow:0 8px 20px rgba(60,45,20,.1)}
+.stat span{font-size:13px;color:#6b604b;display:block;margin-bottom:4px}
+.stat b{font-size:20px;font-variant-numeric:tabular-nums}
+.stat.hi{background:var(--ink);color:#fff}
+.stat.hi span{color:#e9dfc7}
+.chart{width:100%;height:auto}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-grid.wd span{text-align:center;font-size:12px;color:#6b604b}
+.day{background:#f3ead5;border:0;border-radius:12px;padding:6px 2px;min-height:54px;font:inherit;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink)}
+.day small{font-size:10px;font-weight:600;color:#0b7a68}
+.day.has{background:#c9f0e8}
+.day.today{outline:2px solid var(--or)}
+.day.sel{background:var(--ink);color:#fff}
+.day.sel small{color:#9ff0df}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.exports{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.exports .btn{color:#fff}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(140px);background:var(--ink);color:#fff;padding:14px 20px;border-radius:14px;transition:transform .3s;max-width:90%;text-align:center;z-index:9}
+#toast.on{transform:translateX(-50%) translateY(0)}
+
+/* ---- Logo ---- */
+.logo{display:block;width:100%;height:auto;overflow:visible}
+.logo.big{max-width:440px;margin:0 auto}
+.logo.small{width:120px}
+.logo .circle{transform-box:fill-box;transform-origin:center;animation:pop .8s cubic-bezier(.2,.9,.25,1.2) both}
+.logo .c1{animation-delay:.1s}.logo .c2{animation-delay:.3s}.logo .c3{animation-delay:.5s}
+.logo .cut{transform-box:fill-box;transform-origin:50% 100%;animation:rise .7s ease-out both}
+.logo .cut.f{animation-delay:.9s}.logo .cut.s{animation-delay:1.05s}.logo .cut.k{animation-delay:1.2s}
+.logo .word{animation:rise .9s ease-out both;animation-delay:1.35s}
+.logo .bar{transform-box:fill-box;transform-origin:left center;animation:grow .7s ease-out both}
+.logo .b1{animation-delay:1.9s}.logo .b2{animation-delay:2.05s}.logo .b3{animation-delay:2.2s}
+.logo.static *{animation:none!important}
+
+/* ---- Bars ---- */
+.bar-grow{transform-box:fill-box;transform-origin:50% 100%;animation:grow-y .8s ease-out both}
+
+@keyframes pop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+@keyframes rise{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes grow-y{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-delay:0s!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header id="top"></header>
+  <main class="stage" id="stage"></main>
+</div>
+<div id="toast"></div>
+
+<script>
+/* =========================================================
+   KONFIGURÁCIÓ – Firebase (Project settings → Your apps → Web)
+   Amíg a PROJEKT szó szerepel a databaseURL-ben, élő mód nem aktiválódik.
+   ========================================================= */
+const CONFIG = {
+  apiKey: "IDE_A_FIREBASE_API_KEY",
+  authDomain: "PROJEKT.firebaseapp.com",
+  databaseURL: "https://PROJEKT-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "PROJEKT",
+  appId: "IDE_A_APP_ID"
+};
+const ADMIN_EMAIL_DOMAIN = "menza-zaras.local"; // admin felhasználónév → felhasználónév@menza-zaras.local
+const DB_PATH = "zarasok";
+
+/* ---------- Kérdések ---------- */
+const MONEY_STEPS = [
+  { key:"opening",     q:"Nyitó összeg a kasszában",                 hint:"Mennyi pénz volt a kasszában nyitáskor?" , group:"plus" },
+  { key:"goorderz",    q:"Napi forgalom (GoOrderz)",                 hint:"", group:"plus" },
+  { key:"foodbird",    q:"Napi forgalom (Foodbird)",                 hint:"", group:"plus" },
+  { key:"card",        q:"Bankkártya forgalom",                      hint:"", group:"minus" },
+  { key:"szep",        q:"SZÉP-kártya forgalom",                     hint:"", group:"minus" },
+  { key:"cash",        q:"Készpénzes forgalom",                      hint:"", group:"minus" },
+  { key:"nextOpening", q:"Következő nyitóösszeg a kasszában",        hint:"", group:"minus" },
+  { key:"salaries",    q:"Fizetések",                                hint:"Add meg, kinek mennyi fizetés ment ki.", type:"list", labelPh:"Név", group:"minus" },
+  { key:"expenses",    q:"Kiadások",                                 hint:"Opcionális. Ha nincs, hagyd üresen.", type:"list", labelPh:"Mire", group:"minus" }
+];
+const MONEY_KEYS = ["opening","goorderz","foodbird","card","szep","cash","nextOpening"];
+const CHECKS = [
+  { q:"Lekapcsoltad a klímát?",                              fix:"Kérlek kapcsold le a klímát." },
+  { q:"Lekapcsoltad az olajsütőt?",                          fix:"Kérlek kapcsold le az olajsütőt." },
+  { q:"A melegentartót és a feltéthűtőt lekapcsoltad?",      fix:"Kérlek kapcsold le a melegentartót és a feltéthűtőt." },
+  { q:"A terminál a töltőn van?",                            fix:"Kérlek rakd a terminált töltőre." },
+  { q:"A telefon a töltőn van?",                             fix:"Kérlek rakd a telefont töltőre." }
+];
+
+/* ---------- Állapot ---------- */
+let fb = null; // { db, auth } ha az élő mód elérhető
+try {
+  if (typeof firebase !== "undefined" && !CONFIG.databaseURL.includes("PROJEKT")) {
+    if (!firebase.apps.length) firebase.initializeApp(CONFIG);
+    fb = { db: firebase.database(), auth: firebase.auth() };
+  }
+} catch (e) { fb = null; }
+
+const S = {
+  mode: fb ? "prod" : "dev",
+  screen: "home",
+  session: null,
+  stepIdx: 0,
+  admin: false,
+  records: null,
+  devSeeded: false,
+  loginErr: "",
+  period: "today",
+  monthOff: 0,
+  selDay: null,
+  openId: null,
+  justAdded: false,
+  saving: false,
+  lastDev: false,
+  tt: null
+};
+
+/* ---------- Segédek ---------- */
+const $ = s => document.querySelector(s);
+const pad = n => String(n).padStart(2, "0");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const parseAmount = s => { const n = parseFloat(String(s ?? "").replace(/\s/g, "").replace(",", ".")); return isFinite(n) ? n : 0; };
+const fmt = n => `${Math.round(n || 0).toLocaleString("hu-HU")} Ft`;
+const fmtShort = n => `${Math.round((n || 0) / 1000).toLocaleString("hu-HU")} e Ft`;
+const todayISO = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const addDays = (iso, n) => { const [y, m, d] = iso.split("-").map(Number); return todayISO(new Date(y, m - 1, d + n)); };
+const weekStart = () => addDays(todayISO(), -((new Date().getDay() + 6) % 7));
+const monthDate = () => { const t = new Date(); return new Date(t.getFullYear(), t.getMonth() + S.monthOff, 1); };
+const rnd = (a, b) => Math.round((a + Math.random() * (b - a)) / 100) * 100;
+const sumAmounts = arr => (arr || []).reduce((a, x) => a + (Number(x.amount) || 0), 0);
+
+function toast(msg) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("on");
+  clearTimeout(S.tt);
+  S.tt = setTimeout(() => t.classList.remove("on"), 2800);
+}
+
+function logo(cls = "") {
+  return `<svg class="logo ${cls}" viewBox="0 0 960 760" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A Menza logó">
+  <circle class="circle c1" cx="185" cy="415" r="150" fill="#E8A010"/>
+  <circle class="circle c2" cx="475" cy="415" r="158" fill="#14B8A0"/>
+  <circle class="circle c3" cx="765" cy="425" r="150" fill="#D91E0E"/>
+  <g fill="#E6DEC8">
+    <g class="cut f">
+      <rect x="150" y="300" width="11" height="150" rx="5.5"/>
+      <rect x="170" y="300" width="11" height="150" rx="5.5"/>
+      <rect x="190" y="300" width="11" height="150" rx="5.5"/>
+      <rect x="210" y="300" width="11" height="150" rx="5.5"/>
+      <path d="M150 436 L221 436 Q221 472 186 478 Q150 472 150 436 Z"/>
+      <rect x="177" y="470" width="18" height="110" rx="8"/>
+    </g>
+    <g class="cut s">
+      <ellipse cx="475" cy="392" rx="66" ry="90"/>
+      <rect x="467" y="470" width="16" height="112" rx="8"/>
+    </g>
+    <g class="cut k">
+      <path d="M752 300 Q770 296 780 312 L782 470 L752 470 Z"/>
+      <rect x="752" y="466" width="26" height="116" rx="10"/>
+    </g>
+  </g>
+  <text class="word" x="480" y="690" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="178" fill="#111">A Menza</text>
+  <rect class="bar b1" x="115" y="700" width="240" height="10" fill="#E8A010"/>
+  <rect class="bar b2" x="355" y="700" width="240" height="10" fill="#14B8A0"/>
+  <rect class="bar b3" x="595" y="700" width="240" height="10" fill="#D91E0E"/>
+</svg>`;
+}
+
+/* ---------- Képernyők ---------- */
+function render() {
+  const top = $("#top");
+  if (S.screen === "home") {
+    top.innerHTML = `<div class="clockbox"><b id="clock"></b><span id="date"></span></div>`;
+  } else {
+    top.innerHTML = `${logo("static small")}<div class="clockbox"><b id="clock"></b><span id="date"></span></div>`;
+  }
+  const views = {
+    home: renderHome, closer: renderCloser, money: renderMoney, checks: renderChecks,
+    review: renderReview, saving: renderSaving, done: renderDone, login: renderLogin, admin: renderAdmin
+  };
+  $("#stage").innerHTML = `<div class="screen">${views[S.screen]()}</div>`;
+  updateClock();
+  const f = document.querySelector("[data-focus]");
+  if (f) f.focus({ preventScroll: true });
+  S.justAdded = false;
+}
+
+function updateClock() {
+  const now = new Date();
+  const c = $("#clock"), d = $("#date");
+  if (c) c.textContent = now.toLocaleTimeString("hu-HU", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  if (d) d.textContent = now.toLocaleDateString("hu-HU", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+}
+setInterval(updateClock, 1000);
+
+function renderHome() {
+  const dev = S.mode === "dev";
+  return `
+    ${logo("big")}
+    <span class="badge ${dev ? "dev" : "live"}">${dev ? "FEJLESZTŐI MÓD · nem ment semmit" : "ÉLES MÓD · mentés Firebase-be"}</span>
+    <button class="btn btn-big btn-or" onclick="startClosing()">ZÁRÁS INDÍTÁSA</button>
+    <div class="row2">
+      <button class="btn btn-ghost" onclick="openAdmin()">Admin</button>
+      <button class="btn btn-ghost" onclick="toggleMode()">${dev ? "Élő módra váltás" : "Fejlesztői módra váltás"}</button>
+    </div>
+    ${fb ? "" : `<p class="muted small">Élő mentés most nincs csatlakoztatva (a Firebase beállítás hiányzik, vagy ebben a nézetben nem érhető el). Teszt módban minden működik, de nem ment.</p>`}`;
+}
+
+function renderCloser() {
+  return `
+    <p class="kicker">Zárás</p>
+    <h2>Ki zár ma?</h2>
+    <input data-focus id="closer" placeholder="Írd be a neved" autocomplete="off" value="${esc(S.session?.closer || "")}" onkeydown="if(event.key==='Enter')setCloser()">
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="goHome()">Vissza</button>
+      <button class="btn btn-or" onclick="setCloser()">Tovább</button>
+    </div>`;
+}
+
+function renderMoney() {
+  const st = MONEY_STEPS[S.stepIdx];
+  const n = S.stepIdx + 1, total = MONEY_STEPS.length;
+  const head = `<div class="progress"><span>${n} / ${total}</span><div class="bar"><i style="width:${n / total * 100}%"></i></div></div>`;
+  if (st.type === "list") return head + renderList(st) + nav();
+  const kicker = st.group === "plus" ? "Plusz tétel" : "Levonás";
+  const val = S.session.values[st.key] ?? "";
+  return head + `
+    <div class="card">
+      <p class="kicker">${kicker}</p>
+      <h2>${st.q}</h2>
+      ${st.hint ? `<p class="muted">${st.hint}</p>` : ""}
+      <div class="amount">
+        <input data-focus inputmode="decimal" autocomplete="off" placeholder="0" value="${esc(val)}"
+          oninput="S.session.values['${st.key}']=this.value" onkeydown="if(event.key==='Enter')nextStep()">
+        <span>Ft</span>
+      </div>
+    </div>` + nav();
+}
+
+function renderList(st) {
+  const rows = S.session[st.key];
+  const body = rows.length
+    ? rows.map((r, i) => `
+      <div class="row">
+        <input ${S.justAdded && i === rows.length - 1 ? "data-focus" : ""} placeholder="${st.labelPh}" value="${esc(r.name)}"
+          oninput="updRow('${st.key}',${i},'name',this.value)">
+        <input inputmode="decimal" placeholder="Összeg (Ft)" value="${esc(r.amount)}"
+          oninput="updRow('${st.key}',${i},'amount',this.value)">
+        <button class="x" onclick="delRow('${st.key}',${i})" aria-label="Törlés">×</button>
+      </div>`).join("")
+    : `<p class="muted">Nincs bejegyzés.</p>`;
+  return `
+    <div class="card">
+      <p class="kicker">${st.key === "salaries" ? "Kifizetés" : "Opcionális"}</p>
+      <h2>${st.q}</h2>
+      <p class="muted">${st.hint}</p>
+      ${body}
+      <button class="btn btn-ghost" onclick="addRow('${st.key}')">+ Hozzáadás</button>
+    </div>`;
+}
+
+function nav() {
+  return `<div class="nav">
+    <button class="btn btn-ghost" onclick="prevStep()">Vissza</button>
+    <button class="btn btn-or" onclick="nextStep()">Tovább</button>
+  </div>`;
+}
+
+function renderChecks() {
+  const idx = S.session.checkIdx;
+  if (S.session.blocked) {
+    const c = CHECKS[idx];
+    return `
+      <div class="card block">
+        <div class="stop">!</div>
+        <h2>Még nem mehetsz tovább</h2>
+        <p class="fix">${c.fix}</p>
+        <button class="btn btn-re btn-big" onclick="unblock()">Kész, ellenőrzöm újra</button>
+      </div>`;
+  }
+  const c = CHECKS[idx];
+  return `
+    <div class="progress"><span>${idx + 1} / ${CHECKS.length}</span><div class="bar"><i style="width:${(idx + 1) / CHECKS.length * 100}%"></i></div></div>
+    <div class="card">
+      <p class="kicker">Ellenőrzés</p>
+      <h2>${c.q}</h2>
+      <div class="yn">
+        <button class="btn btn-te btn-big" onclick="answerCheck(true)">IGEN</button>
+        <button class="btn btn-re btn-big" onclick="answerCheck(false)">NEM</button>
+      </div>
+    </div>
+    <button class="linkbtn" onclick="backToMoney()">← Vissza a pénzügyi kérdésekhez</button>`;
+}
+
+function renderReview() {
+  const s = S.session;
+  const moneyRows = MONEY_STEPS.filter(x => !x.type).map(x =>
+    `<div class="rv"><span>${x.q}</span><b>${fmt(parseAmount(s.values[x.key]))}</b></div>`).join("");
+  const listRows = key => s[key].length
+    ? s[key].map(x => `<div class="rv sub"><span>${esc(x.name) || "—"}</span><b>${fmt(parseAmount(x.amount))}</b></div>`).join("")
+    : `<div class="rv sub"><span>Nincs</span><b>—</b></div>`;
+  const checkRows = CHECKS.map(c => `<div class="rv"><span>${c.q}</span><b class="ok">Igen ✓</b></div>`).join("");
+  return `
+    <p class="kicker">Ellenőrzés a zárás előtt</p>
+    <h2>${esc(s.closer)}</h2>
+    <div class="card">
+      <h3>Pénzügyek</h3>
+      ${moneyRows}
+      <div class="rv"><span>Fizetések</span><b></b></div>
+      ${listRows("salaries")}
+      <div class="rv"><span>Kiadások</span><b></b></div>
+      ${listRows("expenses")}
+    </div>
+    <div class="card">
+      <h3>Ellenőrzőkérdések</h3>
+      ${checkRows}
+    </div>
+    <button class="btn btn-re btn-big" onclick="closeDay()">ZÁRÁS</button>
+    <button class="linkbtn" onclick="editFromStart()">← Módosítás</button>`;
+}
+
+function renderSaving() {
+  return `
+    <div class="card" style="text-align:center">
+      ${logo("static small")}
+      <h2>Mentés…</h2>
+      <p class="muted">Kérlek, ne zárd be az appot.</p>
+    </div>`;
+}
+
+function renderDone() {
+  return `
+    <div class="card" style="text-align:center">
+      ${logo("static small")}
+      <h2>Köszönjük szépen, jó pihenést! :)</h2>
+      ${S.lastDev ? `<p class="badge dev">Teszt mód: nem került mentésre</p>` : ""}
+    </div>
+    <button class="btn btn-or btn-big" onclick="goHome()">Főoldal</button>`;
+}
+
+function renderLogin() {
+  return `
+    <p class="kicker">Admin</p>
+    <h2>Belépés</h2>
+    <form class="card" onsubmit="adminLogin(event)">
+      <label class="field-label">Felhasználónév</label>
+      <input id="au" autocomplete="username" data-focus>
+      <label class="field-label" style="margin-top:14px">Jelszó</label>
+      <input id="ap" type="password" autocomplete="current-password">
+      <p class="err" style="margin-top:12px">${esc(S.loginErr)}</p>
+      <div class="nav" style="margin-top:8px">
+        <button type="button" class="btn btn-ghost" onclick="goHome()">Vissza</button>
+        <button class="btn btn-or" type="submit">Belépés</button>
+      </div>
+      ${S.mode === "dev" ? `<p class="muted small">Teszt: admin / teszt</p>` : ""}
+    </form>`;
+}
+
+/* ---------- Admin ---------- */
+function normalize(r) {
+  r.values = r.values || {};
+  r.salaries = r.salaries || [];
+  r.expenses = r.expenses || [];
+  return r;
+}
+
+function periodRecords() {
+  const recs = S.records || [];
+  const t = todayISO();
+  switch (S.period) {
+    case "today": return recs.filter(r => r.date === t);
+    case "yesterday": return recs.filter(r => r.date === addDays(t, -1));
+    case "week": { const ws = weekStart(); return recs.filter(r => r.date >= ws && r.date <= t); }
+    case "month": return recs.filter(r => r.date.slice(0, 7) === t.slice(0, 7));
+    case "calendar": {
+      const ym = todayISO(monthDate()).slice(0, 7);
+      return recs.filter(r => r.date.slice(0, 7) === ym && (!S.selDay || r.date === S.selDay));
+    }
+  }
+  return [];
+}
+
+function periodLabel() {
+  const t = todayISO();
+  return {
+    today: `Ma (${t})`,
+    yesterday: `Tegnap (${addDays(t, -1)})`,
+    week: `Hét: ${weekStart()} – ${t}`,
+    month: `Hónap: ${t.slice(0, 7)}`,
+    calendar: `Naptár: ${monthDate().toLocaleDateString("hu-HU", { year: "numeric", month: "long" })}${S.selDay ? " · " + S.selDay : ""}`
+  }[S.period];
+}
+
+function sums(list) {
+  const o = { gross: 0, card: 0, szep: 0, cash: 0, sal: 0, exp: 0, diff: 0 };
+  list.forEach(r => {
+    o.gross += r.gross; o.card += r.values.card; o.szep += r.values.szep; o.cash += r.values.cash;
+    o.sal += r.salSum; o.exp += r.expSum; o.diff += r.diff;
+  });
+  return o;
+}
+
+function renderAdmin() {
+  const list = periodRecords();
+  const s = sums(list);
+  const tabs = [["today", "Ma"], ["yesterday", "Tegnap"], ["week", "Hét"], ["month", "Hónap"], ["calendar", "Naptár"]]
+    .map(([k, l]) => `<button class="tab ${S.period === k ? "on" : ""}" onclick="setPeriod('${k}')">${l}</button>`).join("");
+  const cards = [
+    ["Forgalom", s.gross], ["Bankkártya", s.card], ["SZÉP", s.szep], ["Készpénz", s.cash],
+    ["Fizetések", s.sal], ["Kiadások", s.exp]
+  ].map(([l, v]) => `<div class="stat"><span>${l}</span><b>${fmt(v)}</b></div>`).join("")
+    + `<div class="stat hi"><span>Különbözet</span><b class="${Math.abs(s.diff) < 1 ? "" : ""}">${fmt(s.diff)}</b></div>`;
+  return `
+    <div class="toolbar">
+      <div><p class="kicker">Admin</p><h2 style="margin:0">Kimutatások</h2></div>
+      <button class="btn btn-ghost sm" onclick="logout()">Kijelentkezés</button>
+    </div>
+    ${S.mode === "dev" ? `<span class="badge dev">Teszt adatok</span>` : ""}
+    <div class="tabs">${tabs}</div>
+    ${S.period === "calendar" ? `<div class="card">${calendarHTML()}</div>` : ""}
+    <p class="muted small">${periodLabel()} · ${list.length} zárás</p>
+    <div class="stats">${cards}</div>
+    <div class="card"><h3>Napi forgalom</h3>${barChart(list)}</div>
+    <div class="card"><h3>Zárások</h3>${recordsTable(list)}</div>
+    <div class="exports">
+      <button class="btn btn-te" onclick="exportExcel()">Excel export</button>
+      <button class="btn btn-re" onclick="exportPDF()">PDF export</button>
+    </div>
+    <button class="linkbtn" onclick="goHome()">← Főoldal</button>`;
+}
+
+function barChart(list) {
+  if (!list.length) return `<p class="muted">Nincs adat ebben az időszakban.</p>`;
+  const byDay = {};
+  list.forEach(r => byDay[r.date] = (byDay[r.date] || 0) + r.gross);
+  const days = Object.keys(byDay).sort();
+  const max = Math.max(...Object.values(byDay), 1);
+  const W = 520, H = 200, slot = (W - 20) / days.length, bw = Math.max(6, Math.min(40, slot - 6));
+  const bars = days.map((d, i) => {
+    const h = byDay[d] / max * (H - 40);
+    const x = 10 + i * slot;
+    return `<g>
+      <rect class="bar-grow" style="animation-delay:${i * 40}ms" x="${x}" y="${H - 22 - h}" width="${bw}" height="${h}" rx="6" fill="#14B8A0"/>
+      <text x="${x + bw / 2}" y="${H - 6}" text-anchor="middle" font-size="10" fill="#1d1a14">${d.slice(8)}</text>
+    </g>`;
+  }).join("");
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Napi forgalom">${bars}</svg>`;
+}
+
+function calendarHTML() {
+  const first = monthDate();
+  const y = first.getFullYear(), m = first.getMonth();
+  const n = new Date(y, m + 1, 0).getDate();
+  const off = (first.getDay() + 6) % 7;
+  const byDate = {};
+  (S.records || []).forEach(r => byDate[r.date] = (byDate[r.date] || 0) + r.gross);
+  let cells = "";
+  for (let i = 0; i < off; i++) cells += "<span></span>";
+  for (let d = 1; d <= n; d++) {
+    const iso = `${y}-${pad(m + 1)}-${pad(d)}`;
+    const v = byDate[iso];
+    const cls = [v ? "has" : "", S.selDay === iso ? "sel" : "", iso === todayISO() ? "today" : ""].join(" ");
+    cells += `<button class="day ${cls}" onclick="pickDay('${iso}')">${d}${v ? `<small>${fmtShort(v)}</small>` : ""}</button>`;
+  }
+  return `
+    <div class="cal-head">
+      <button class="btn btn-ghost sm" onclick="monthNav(-1)">‹</button>
+      <b>${first.toLocaleDateString("hu-HU", { year: "numeric", month: "long" })}</b>
+      <button class="btn btn-ghost sm" onclick="monthNav(1)">›</button>
+    </div>
+    <div class="cal-grid wd">${["H","K","Sze","Cs","P","Szo","V"].map(x => `<span>${x}</span>`).join("")}</div>
+    <div class="cal-grid" style="margin-top:6px">${cells}</div>
+    ${S.selDay
+      ? `<p class="muted small">Kiválasztott nap: ${S.selDay} · <button class="linkbtn" onclick="clearDay()">mind a hónap</button></p>`
+      : `<p class="muted small">Válassz egy napot a részletekhez.</p>`}`;
+}
+
+function recordsTable(list) {
+  if (!list.length) return `<p class="muted">Nincs zárás ebben az időszakban.</p>`;
+  const rows = [...list].sort((a, b) => a.date < b.date ? 1 : -1).map(r => `
+    <tr class="click" onclick="toggleOpen('${r.id}')">
+      <td>${r.date}</td><td>${esc(r.closer)}</td><td>${fmt(r.gross)}</td><td>${fmt(r.values.cash)}</td>
+      <td class="${Math.abs(r.diff) < 1 ? "ok" : "warn"}">${fmt(r.diff)}</td>
+    </tr>${S.openId === r.id ? detailRow(r) : ""}`).join("");
+  return `<div class="tablewrap"><table>
+    <thead><tr><th>Dátum</th><th>Záró</th><th>Forgalom</th><th>Készpénz</th><th>Különbözet</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+function detailRow(r) {
+  const v = r.values;
+  const people = r.salaries.length
+    ? r.salaries.map(x => `<div>${esc(x.name)} – ${fmt(x.amount)}</div>`).join("") : "<div>Nincs</div>";
+  const exp = r.expenses.length
+    ? r.expenses.map(x => `<div>${esc(x.name)} – ${fmt(x.amount)}</div>`).join("") : "<div>Nincs</div>";
+  return `<tr class="detail"><td colspan="5">
+    <div class="grid2">
+      <div><b>Nyitó</b><br>${fmt(v.opening)}</div>
+      <div><b>GoOrderz</b><br>${fmt(v.goorderz)}</div>
+      <div><b>Foodbird</b><br>${fmt(v.foodbird)}</div>
+      <div><b>Következő nyitó</b><br>${fmt(v.nextOpening)}</div>
+      <div><b>Bankkártya</b><br>${fmt(v.card)}</div>
+      <div><b>SZÉP</b><br>${fmt(v.szep)}</div>
+      <div><b>Készpénz</b><br>${fmt(v.cash)}</div>
+      <div><b>Zárás ideje</b><br>${esc((r.closedAt || "").slice(11, 16))}</div>
+    </div>
+    <p><b>Fizetések</b>${people}</p>
+    <p><b>Kiadások</b>${exp}</p>
+    <p class="ok">Minden ellenőrzőkérdésre igen volt a válasz.</p>
+  </td></tr>`;
+}
+
+/* ---------- Export ---------- */
+function exportExcel() {
+  const list = periodRecords();
+  if (!list.length) return toast("Nincs exportálható adat ebben az időszakban.");
+  const wb = XLSX.utils.book_new();
+  const rows = list.map(r => ({
+    "Dátum": r.date, "Záró": r.closer, "Nyitó": r.values.opening, "GoOrderz": r.values.goorderz,
+    "Foodbird": r.values.foodbird, "Forgalom": r.gross, "Bankkártya": r.values.card, "SZÉP": r.values.szep,
+    "Készpénz": r.values.cash, "Következő nyitó": r.values.nextOpening, "Fizetések": r.salSum,
+    "Kiadások": r.expSum, "Különbözet": r.diff, "Zárás": (r.closedAt || "").slice(11, 16)
+  }));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), "Zárások");
+  const pay = [];
+  list.forEach(r => r.salaries.forEach(x => pay.push({ "Dátum": r.date, "Név": x.name, "Összeg": x.amount })));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(pay.length ? pay : [{ "Dátum": "", "Név": "", "Összeg": "" }]), "Fizetések");
+  const exp = [];
+  list.forEach(r => r.expenses.forEach(x => exp.push({ "Dátum": r.date, "Megnevezés": x.name, "Összeg": x.amount })));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(exp.length ? exp : [{ "Dátum": "", "Megnevezés": "", "Összeg": "" }]), "Kiadások");
+  XLSX.writeFile(wb, `menza-zarasok-${S.period}-${todayISO()}.xlsx`);
+}
+
+async function exportPDF() {
+  const list = periodRecords();
+  if (!list.length) return toast("Nincs exportálható adat ebben az időszakban.");
+  const s = sums(list);
+  const wrap = document.createElement("div");
+  wrap.style.cssText = "position:fixed;left:-10000px;top:0;width:794px;background:#fff;padding:32px;font-family:Arial,sans-serif;color:#1d1a14";
+  const rows = [...list].sort((a, b) => a.date < b.date ? -1 : 1).map(r => `
+    <tr><td>${r.date}</td><td>${esc(r.closer)}</td><td>${fmt(r.gross)}</td><td>${fmt(r.values.card)}</td>
+    <td>${fmt(r.values.szep)}</td><td>${fmt(r.values.cash)}</td><td>${fmt(r.salSum)}</td><td>${fmt(r.expSum)}</td><td>${fmt(r.diff)}</td></tr>`).join("");
+  wrap.innerHTML = `
+    <h1 style="margin:0 0 4px;font-family:Georgia,serif">A Menza – Zárási kimutatás</h1>
+    <p style="margin:0 0 16px;color:#555">${periodLabel()}</p>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr style="background:#1d1a14;color:#fff">
+        <th style="padding:6px">Dátum</th><th style="padding:6px">Záró</th><th style="padding:6px">Forgalom</th>
+        <th style="padding:6px">Bankkártya</th><th style="padding:6px">SZÉP</th><th style="padding:6px">Készpénz</th>
+        <th style="padding:6px">Fizetések</th><th style="padding:6px">Kiadások</th><th style="padding:6px">Különbözet</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr style="font-weight:bold;border-top:2px solid #1d1a14">
+        <td style="padding:6px" colspan="2">Összesen</td><td style="padding:6px">${fmt(s.gross)}</td><td style="padding:6px">${fmt(s.card)}</td>
+        <td style="padding:6px">${fmt(s.szep)}</td><td style="padding:6px">${fmt(s.cash)}</td><td style="padding:6px">${fmt(s.sal)}</td>
+        <td style="padding:6px">${fmt(s.exp)}</td><td style="padding:6px">${fmt(s.diff)}</td></tr></tfoot>
+    </table>`;
+  document.body.appendChild(wrap);
+  try {
+    const canvas = await html2canvas(wrap, { scale: 2, backgroundColor: "#ffffff" });
+    const pdf = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
+    const margin = 10, imgW = 210 - 2 * margin, pxPerMm = canvas.width / imgW;
+    const sliceH = Math.floor((297 - 2 * margin) * pxPerMm);
+    let y = 0, first = true;
+    while (y < canvas.height) {
+      const h = Math.min(sliceH, canvas.height - y);
+      const c = document.createElement("canvas");
+      c.width = canvas.width; c.height = h;
+      c.getContext("2d").drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
+      if (!first) pdf.addPage();
+      first = false;
+      pdf.addImage(c.toDataURL("image/png"), "PNG", margin, margin, imgW, h / pxPerMm);
+      y += h;
+    }
+    pdf.save(`menza-kimutatas-${S.period}-${todayISO()}.pdf`);
+  } catch (e) {
+    toast("PDF export nem sikerült: " + e.message);
+  } finally {
+    wrap.remove();
+  }
+}
+
+/* ---------- Navigáció és események ---------- */
+function goHome() {
+  S.screen = "home"; S.session = null; S.stepIdx = 0; render();
+}
+
+function startClosing() {
+  S.session = { closer: "", values: {}, salaries: [], expenses: [], checkIdx: 0, blocked: false };
+  S.stepIdx = 0;
+  S.screen = "closer";
+  render();
+}
+
+function setCloser() {
+  const name = $("#closer").value.trim();
+  if (!name) return toast("Add meg a neved.");
+  S.session.closer = name;
+  S.stepIdx = 0;
+  S.screen = "money";
+  render();
+}
+
+function nextStep() {
+  const st = MONEY_STEPS[S.stepIdx];
+  if (st.type !== "list") {
+    const v = S.session.values[st.key];
+    if (v === undefined || String(v).trim() === "") return toast("Add meg az összeget (0 is lehet).");
+  }
+  if (S.stepIdx < MONEY_STEPS.length - 1) {
+    S.stepIdx++;
+  } else {
+    S.session.checkIdx = 0;
+    S.session.blocked = false;
+    S.screen = "checks";
+  }
+  render();
+}
+
+function prevStep() {
+  if (S.stepIdx > 0) S.stepIdx--;
+  else { S.screen = "closer"; }
+  render();
+}
+
+function addRow(key) {
+  S.session[key].push({ name: "", amount: "" });
+  S.justAdded = true;
+  render();
+}
+function updRow(key, i, field, val) { S.session[key][i][field] = val; }
+function delRow(key, i) { S.session[key].splice(i, 1); render(); }
+
+function answerCheck(ok) {
+  if (!ok) { S.session.blocked = true; return render(); }
+  S.session.checkIdx++;
+  if (S.session.checkIdx >= CHECKS.length) S.screen = "review";
+  render();
+}
+function unblock() { S.session.blocked = false; render(); }
+function backToMoney() { S.stepIdx = MONEY_STEPS.length - 1; S.screen = "money"; render(); }
+function editFromStart() { S.stepIdx = 0; S.screen = "money"; render(); }
+
+function makeRecord({ date, closer, values, salaries, expenses, closedAt }) {
+  const salSum = sumAmounts(salaries), expSum = sumAmounts(expenses);
+  const gross = values.opening + values.goorderz + values.foodbird;
+  const ded = values.card + values.szep + values.cash + values.nextOpening + salSum + expSum;
+  return {
+    date, closedAt, closer, values, salaries, expenses, salSum, expSum,
+    gross, ded, diff: gross - ded, checks: CHECKS.map(c => c.q)
+  };
+}
+
+async function closeDay() {
+  if (S.saving) return;
+  S.saving = true;
+  S.screen = "saving"; render();
+  const s = S.session;
+  const values = {};
+  MONEY_KEYS.forEach(k => values[k] = parseAmount(s.values[k]));
+  const clean = arr => arr.map(x => ({ name: String(x.name || "").trim(), amount: parseAmount(x.amount) }))
+    .filter(x => x.name || x.amount);
+  const rec = makeRecord({
+    date: todayISO(), closer: s.closer, values,
+    salaries: clean(s.salaries), expenses: clean(s.expenses),
+    closedAt: new Date().toISOString()
+  });
+  try {
+    if (S.mode === "prod") {
+      if (!fb) throw new Error("nincs Firebase kapcsolat");
+      await fb.db.ref(DB_PATH).push(rec);
+    } else {
+      // Fejlesztői mód: nem ment semmit
+      await new Promise(r => setTimeout(r, 900));
+    }
+    S.lastDev = S.mode === "dev";
+    S.session = null;
+    S.screen = "done";
+  } catch (e) {
+    S.screen = "review";
+    toast("Mentési hiba: " + e.message);
+  }
+  S.saving = false;
+  render();
+}
+
+function toggleMode() {
+  if (S.mode === "dev") {
+    if (!fb) return toast("Élő mód nincs beállítva: töltsd ki a Firebase CONFIG-ot.");
+    S.mode = "prod";
+  } else {
+    S.mode = "dev";
+  }
+  S.admin = false; S.records = null; S.devSeeded = false;
+  render();
+}
+
+function openAdmin() { S.loginErr = ""; S.screen = "login"; render(); }
+
+function seedDev() {
+  if (S.devSeeded) return;
+  S.devSeeded = true;
+  const t = todayISO();
+  const names = ["Teszt Anna", "Teszt Bence", "Teszt Csilla"];
+  const recs = [];
+  for (let i = 0; i < 60; i++) {
+    if (i > 0 && Math.random() < 0.2) continue;
+    const date = addDays(t, -i);
+    const values = {
+      opening: rnd(20000, 40000), goorderz: rnd(60000, 160000), foodbird: rnd(40000, 140000),
+      card: rnd(40000, 120000), szep: rnd(5000, 30000), cash: rnd(20000, 60000), nextOpening: rnd(20000, 40000)
+    };
+    const salaries = [{ name: names[i % 3], amount: rnd(8000, 15000) }, { name: names[(i + 1) % 3], amount: rnd(8000, 15000) }];
+    const expenses = i % 4 === 0 ? [{ name: "Zöldség", amount: rnd(3000, 9000) }] : [];
+    recs.push({ ...makeRecord({ date, closer: names[i % 3], values, salaries, expenses, closedAt: date + "T22:30:00.000Z" }), id: "seed" + i });
+  }
+  S.records = recs;
+}
+
+async function loadRecords() {
+  const snap = await fb.db.ref(DB_PATH).once("value");
+  S.records = Object.entries(snap.val() || {}).map(([id, r]) => normalize({ ...r, id }));
+}
+
+async function adminLogin(e) {
+  e.preventDefault();
+  const u = $("#au").value.trim(), p = $("#ap").value;
+  S.loginErr = "";
+  try {
+    if (S.mode === "dev") {
+      if (u !== "admin" || p !== "teszt") throw new Error("Hibás felhasználónév vagy jelszó.");
+      seedDev();
+    } else {
+      if (!fb) throw new Error("Nincs élő kapcsolat.");
+      await fb.auth.signInWithEmailAndPassword(`${u}@${ADMIN_EMAIL_DOMAIN}`, p);
+      await loadRecords();
+    }
+    S.admin = true;
+    S.screen = "admin";
+    S.period = "today";
+  } catch (err) {
+    S.loginErr = (err.code || "").startsWith("auth/") ? "Hibás felhasználónév vagy jelszó." : err.message;
+  }
+  render();
+}
+
+async function logout() {
+  if (fb && S.mode === "prod") { try { await fb.auth.signOut(); } catch (e) {} }
+  S.admin = false; S.records = null; S.devSeeded = false; S.openId = null;
+  S.screen = "home";
+  render();
+}
+
+function setPeriod(k) { S.period = k; if (k !== "calendar") S.selDay = null; S.openId = null; render(); }
+function monthNav(d) { S.monthOff += d; S.selDay = null; render(); }
+function pickDay(iso) { S.selDay = iso; S.period = "calendar"; S.openId = null; render(); }
+function clearDay() { S.selDay = null; render(); }
+function toggleOpen(id) { S.openId = S.openId === id ? null : id; render(); }
+
+/* ---------- Indítás ---------- */
+render();
+</script>
+</body>
+</html>
