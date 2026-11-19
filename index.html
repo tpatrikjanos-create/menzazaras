@@ -198,12 +198,12 @@ label{display:block;font-size:13px;color:var(--mute);margin:14px 0 6px;letter-sp
 /* ===================== FIREBASE ===================== */
 // Külön Firebase projekt az zárás appnak. Amíg a PROJEKT / IDE_ szöveg szerepel, csak teszt/demó működik.
 const FIREBASE_CONFIG={
-  apiKey:"IDE_A_FIREBASE_API_KEY",
-  authDomain:"PROJEKT.firebaseapp.com",
-  databaseURL:"https://PROJEKT-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:"PROJEKT",
-  storageBucket:"PROJEKT.firebasestorage.app",
-  appId:"IDE_A_APP_ID"
+  apiKey:"AIzaSyC2Rcti5t2rUDbPawyeV6eNOiaNJ6rI4Ro",
+  authDomain:"menzazaras.firebaseapp.com",
+  databaseURL:"https://menzazaras-default-rtdb.europe-west1.firebasedatabase.app", // régió: ellenőrizd a Realtime Database oldalán
+  projectId:"menzazaras",
+  storageBucket:"menzazaras.firebasestorage.app",
+  appId:"1:99283686644:web:a4bf53427784c87180faa1"
 };
 const CONFIGURED=!FIREBASE_CONFIG.databaseURL.includes("PROJEKT")&&!FIREBASE_CONFIG.apiKey.startsWith("IDE_");
 const ADMIN_USER="admin";              // az egyetlen zárt fiók
