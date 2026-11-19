@@ -877,6 +877,9 @@ const screens={
 
     return `${banner()}${top("Vezetői nézet","Admin",right)}
       <main class="wrap" style="margin-top:8px">
+        ${S.env==="live"&&demoLeft()>0?`<section class="devcard rise">
+          <div class="dc-text"><b>Demó</b><small>Alkalmazotti nézet, majd admin nézet, egymás után. Semmi nem mentődik. Még ${demoLeft()}× indítható.</small></div>
+          <button class="btn grad" data-act="demo">Indítás</button></section>`:""}
         ${periodSeg}
         <div class="closelist">${closeBtns}</div>
         <section class="card pie-card"><h3 class="sec" style="margin-top:0">Statisztika</h3>${pie}</section>
@@ -900,9 +903,6 @@ const screens={
       </div>`;}).join(""):`<div class="empty">Nincs mentett zárás.</div>`;
     return `${banner()}${top("Admin","Fejlesztői menü",`<button class="icon" data-act="adminBack" aria-label="Vissza">${ICON_BACK}</button>`)}
       <main class="wrap">
-        ${S.env==="live"&&demoLeft()>0?`<section class="devcard rise">
-          <div class="dc-text"><b>Demó</b><small>Alkalmazotti nézet, majd admin nézet, egymás után. Semmi nem mentődik. Még ${demoLeft()}× indítható.</small></div>
-          <button class="btn grad" data-act="demo">Indítás</button></section>`:""}
         <section class="card">
           <h3 class="serif" style="font-weight:400;margin:0 0 6px">Teszt mód</h3>
           <p class="muted small" style="margin:0 0 12px">Végigmész a zárás lépésein, de semmi nem mentődik.</p>
