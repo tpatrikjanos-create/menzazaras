@@ -87,6 +87,24 @@ button{font:inherit}
 .hero-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;letter-spacing:.08em;text-transform:uppercase;opacity:.75;gap:8px}
 .live{background:rgba(255,255,255,.12);padding:4px 10px;border-radius:99px;text-transform:none;letter-spacing:0;font-size:12px;white-space:nowrap}
 .num{font-family:"DM Serif Display",Georgia,serif;font-size:clamp(44px,11vw,64px);line-height:1;margin:14px 0 6px;font-variant-numeric:tabular-nums}
+/* logó-alapú óra */
+.clock3{display:flex;justify-content:center;align-items:center;margin:20px 0 0;padding:6px 0}
+.cc{position:relative;width:clamp(92px,27vw,118px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-family:"DM Serif Display",Georgia,serif;font-size:clamp(38px,10.5vw,52px);line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;box-shadow:0 16px 30px -12px rgba(0,0,0,.55);animation:pop .8s cubic-bezier(.2,1.2,.4,1) both}
+.cc span{display:block;transform-origin:center}
+.cc span.tick{animation:tickNum .42s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes tickNum{from{transform:translateY(-22%) scale(.86);opacity:.2}to{transform:none;opacity:1}}
+.cc-h{background:var(--orange);z-index:1;animation-delay:.05s}
+.cc-m{background:var(--teal);margin-left:-16px;z-index:2;animation-delay:.2s}
+.cc-s{background:var(--red);color:var(--paper);margin-left:-16px;z-index:3;animation-delay:.35s}
+.cc-s span{position:relative;z-index:1}
+.cc-s .ring{position:absolute;inset:-7px;width:calc(100% + 14px);height:calc(100% + 14px);transform:rotate(-90deg);pointer-events:none;overflow:visible;z-index:0}
+.cc-s .ring circle{fill:none;stroke:var(--paper);stroke-width:3;stroke-linecap:round;opacity:.9}
+.clock-ul{display:flex;justify-content:center;margin:14px auto 0;max-width:calc(3 * clamp(92px,27vw,118px) - 32px)}
+.clock-ul i{flex:1;height:5px;border-radius:3px;transform-origin:left center;animation:grow .7s both}
+.clock-ul .u1{background:var(--orange);animation-delay:.7s}
+.clock-ul .u2{background:var(--teal);animation-delay:.85s}
+.clock-ul .u3{background:var(--red);animation-delay:1s}
+.hero .clock-ul i{box-shadow:0 0 14px rgba(255,255,255,.08)}
 .sec{font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:22px;margin:26px 2px 10px}
 .sec-l{font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:20px;margin:22px 0 8px}
 
@@ -644,7 +662,15 @@ const screens={
       ${CONFIGURED?"":`<div class="notice"><b>Firebase még nincs beállítva.</b> Élő mentés nincs, csak a teszt és a demó működik az admin nézetből.</div>`}
       <section class="hero rise" style="--i:0">
         <div class="hero-top"><span>Pontos idő</span><span class="live" id="date"></span></div>
-        <div class="num" id="clock">--:--:--</div>
+        <div class="clock3" aria-label="Pontos idő">
+          <div class="cc cc-h"><span id="ch">--</span></div>
+          <div class="cc cc-m"><span id="cm">--</span></div>
+          <div class="cc cc-s">
+            <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle id="cring" cx="50" cy="50" r="46" stroke-dasharray="289.03" stroke-dashoffset="289.03"/></svg>
+            <span id="cs">--</span>
+          </div>
+        </div>
+        <div class="clock-ul" aria-hidden="true"><i class="u1"></i><i class="u2"></i><i class="u3"></i></div>
         <p class="muted small" style="margin:0;color:var(--cream);opacity:.7">Nyitás után add meg a neved, és végigmész a kérdéseken.</p>
       </section>
       <div style="margin-top:64px">
@@ -872,9 +898,16 @@ function render(){
   if(S.screen==="derive"&&S.dplay){S.dplay=false;playDerive();}
   if(S.screen!=="derive")S.dtoken++;
 }
+/* Pontos idő: a logó három köre (óra · perc · másodperc), a másodperc-kör gyűrűjével */
+const RING_LEN=2*Math.PI*46;
+function bump(el){el.classList.remove("tick");void el.offsetWidth;el.classList.add("tick");}
 function updateClock(){
-  const c=$("#clock"),d=$("#date"),now=new Date();
-  if(c)c.textContent=now.toLocaleTimeString("hu-HU",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  const d=document.getElementById("date"),now=new Date();
+  const h=document.getElementById("ch"),m=document.getElementById("cm"),s=document.getElementById("cs"),ring=document.getElementById("cring");
+  if(h&&h.textContent!==String(now.getHours()).padStart(2,"0")){h.textContent=String(now.getHours()).padStart(2,"0");bump(h);}
+  if(m&&m.textContent!==String(now.getMinutes()).padStart(2,"0")){m.textContent=String(now.getMinutes()).padStart(2,"0");bump(m);}
+  if(s){s.textContent=String(now.getSeconds()).padStart(2,"0");bump(s);}
+  if(ring)ring.style.strokeDashoffset=(RING_LEN*(1-now.getSeconds()/60)).toFixed(2);
   if(d)d.textContent=now.toLocaleDateString("hu-HU",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 }
 setInterval(updateClock,1000);
